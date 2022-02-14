@@ -1,5 +1,5 @@
 #Don't include CMake stuff
-*/build/
+build/
 
 # Don't inlude the data
 *.txt
