@@ -31,6 +31,7 @@ int main(int argc, char * argv[]) {
   std::string path = argv[1];
   std::string MMG = argv[2];
   int edrift = atoi(argv[3]);
+  std::string data_path = path + "Collection_Efficiency_Studies/";
 
   //Initialize the output text file
   std::ofstream outfile;
@@ -60,7 +61,8 @@ int main(int argc, char * argv[]) {
   // Initialize
   ComponentComsol fm;
   //fm.Initialise("mesh.mphtxt", "dielectrics.dat", "field_"+MMG+"_Eind"+edrift+"_MMG"+mmgv+".txt", "mm");
-  fm.Initialise(path+MMG+"_mesh.mphtxt", path+"dielectrics.dat", path+MMG+"_outfile.txt", "mm");
+  std::string edrift_index = std::to_string(edrift/50+1);
+  fm.Initialise(data_path+MMG+"/"+MMG+"_emsh.mphtxt", data_path+MMG+"/dielectrics.dat", data_path+MMG+"/"+MMG+"_outfile.txt", "mm");
   fm.EnableMirrorPeriodicityX();
   fm.EnableMirrorPeriodicityY();
   fm.PrintRange();
