@@ -20,19 +20,21 @@ using namespace Garfield;
 int main(int argc, char * argv[]) {
 
   TApplication app("app", &argc, argv);
-  if( argc == 3 ) {
-      printf("Will simulate %s for E_drift = %s V/cm\n", argv[1], argv[2]);
+  if( argc == 4 ) {
+      printf("Data path = %s\n", argv[1]);
+      printf("Will simulate %s for E_drift = %s V/cm\n", argv[2], argv[3]);
   }
-  else { printf("Wrond number of arguments provided"); exit(0);}
+  else { printf("Wrong number of arguments provided, should be in form: mmg_single $path $MMG $E_Drift"); exit(0);}
 
   //std::string edrift = "0";
   std::string mmgv = "440"; 
-  std::string MMG = argv[1]; 
-  int edrift = atoi(argv[2]);
+  std::string path = argv[1];
+  std::string MMG = argv[2];
+  int edrift = atoi(argv[3]);
 
   //Initialize the output text file
   std::ofstream outfile;
-  outfile.open("../Results/"+MMG+"_DriftScan.txt", std::ios_base::app); // append instead of overwrite
+  outfile.open(path+"Results/"+MMG+"_DriftScan.txt", std::ios_base::app); // append instead of overwrite
   outfile << "\nMMG, Edrift, MMGdeltaV, nEvents, OutOfBounds, collectedEvents, eColl, Avalanche" << std::endl;
 
   // Geometry constants
@@ -47,7 +49,7 @@ int main(int argc, char * argv[]) {
   double mean_avalanche = 0;
 
   // Sim constants
-  constexpr unsigned int nEvents = 1000;
+  constexpr unsigned int nEvents = 1;
   constexpr double source_size = 0.01;
    
   // Plotting options 
@@ -58,7 +60,7 @@ int main(int argc, char * argv[]) {
   // Initialize
   ComponentComsol fm;
   //fm.Initialise("mesh.mphtxt", "dielectrics.dat", "field_"+MMG+"_Eind"+edrift+"_MMG"+mmgv+".txt", "mm");
-  fm.Initialise(MMG+"_mesh.mphtxt", "dielectrics.dat", MMG+"_outfile.txt", "mm");
+  fm.Initialise(path+MMG+"_mesh.mphtxt", path+"dielectrics.dat", path+MMG+"_outfile.txt", "mm");
   fm.EnableMirrorPeriodicityX();
   fm.EnableMirrorPeriodicityY();
   fm.PrintRange();
@@ -76,7 +78,7 @@ int main(int argc, char * argv[]) {
     cf->SetLeftMargin(0.16);
     fieldView.SetCanvas(cf);
     fieldView.PlotContour();
-    cf->SaveAs("../Results/"+MMG+"/plot_field_"+MMG+"_Edrift"+edrift+"_MMG"+mmgv+".png");
+    cf->SaveAs(path+"Results/"+MMG+"/plot_field_"+MMG+"_Edrift"+edrift+"_MMG"+mmgv+".png");
   }
 
   // Setup the gas.
@@ -90,8 +92,8 @@ int main(int argc, char * argv[]) {
   constexpr double lambdaPenning = 0.;
   gas.EnablePenningTransfer(rPenning, lambdaPenning, "ar");
   // Load the ion mobilities.
-  const std::string path = std::getenv("GARFIELD_INSTALL");
-  gas.LoadIonMobility(path + "/share/Garfield/Data/IonMobility_Ar+_Ar.txt");
+  const std::string path_gar = std::getenv("GARFIELD_INSTALL");
+  gas.LoadIonMobility(path_gar + "/share/Garfield/Data/IonMobility_Ar+_Ar.txt");
   // Associate the gas with the corresponding field map material. 
   const unsigned int nMaterials = fm.GetNumberOfMaterials();
   for (unsigned int i = 0; i < nMaterials; ++i) {
@@ -191,7 +193,7 @@ int main(int argc, char * argv[]) {
       constexpr bool twod = true;
       driftView.Plot(twod);
     }
-    cd->SaveAs("../Results/"+MMG+"/plot_drift_"+MMG+"_Edrift"+edrift+"_MMG"+mmgv+".png");
+    cd->SaveAs(path+"Results/"+MMG+"/plot_drift_"+MMG+"_Edrift"+edrift+"_MMG"+mmgv+".png");
   }
   app.Run(kTRUE);
 }
